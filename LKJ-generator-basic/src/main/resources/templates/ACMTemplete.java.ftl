@@ -3,13 +3,15 @@ import java.util.*;
 
 /**
  * ACM输入模板（多数之和）
- * @author:lkj
+ * @author:${author}
  */
 public class MainTemplate {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+<#if loop>
         while (scanner.hasNext()){
+</#if>
             //输入n个数
             int n = scanner.nextInt();
 
@@ -23,8 +25,10 @@ public class MainTemplate {
             for (int i = 0; i < n; i++) {
                 sum += arr[i];
             }
-            System.out.println("Sum:" + sum);
+            System.out.println("${outputText}:" + sum);
+<#if loop>
         }
+</#if>
         scanner.close();
     }
 }

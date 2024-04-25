@@ -3,6 +3,7 @@ package com.lkj.generator;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IORuntimeException;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,25 +26,31 @@ public class StaticGenerator {
         String inputPath = new File(paraentPath, "LKJ-generator-demo-projects/acm-template").getAbsolutePath();
         //输出路径
         String outputPath = paraentPath;
+        //方法一：使用HuTool工具类
         copyFileByHutool(inputPath,outputPath);
+        //方法二：使用递归遍历
+        copyFileByRecur(inputPath,outputPath);
     }
 
     /**
-     * 复制文件
+     * 复制文件(使用HuTool工具类)
      * @param inputPath 输入路径
      * @param outputPath 输出路径
      */
     public static void copyFileByHutool(String inputPath,String outputPath){
         FileUtil.copy(inputPath,outputPath,false);
     }
-    //区分是文件还是目录
-    //如果是目录，首先创建目标目录
-    //获取目录下的所有文件和字目录
-    //无子文件直接结束
-    //有则递归拷贝下一层
 
-    //如果是文件，直接复制到目标目录下
-
+    public static void copyFileByRecur(String inputPath,String outputPath){
+        File inputFile = new File(inputPath);
+        File outputFile = new File(outputPath);
+        try {
+            copyFileDigui(inputFile,outputFile);
+        } catch (IOException e) {
+            System.out.println("复制失败");
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * 递归实现拷贝文件
@@ -63,20 +70,25 @@ public class StaticGenerator {
             throw new IORuntimeException("Files '{}' and '{}' are equal", src, dest);
         }
 
-        if (src.isDirectory()){//复制目录
-            System.out.println(src.getCanonicalPath());
-            if (dest.exists() && false == dest.isDirectory()){
-                //源为目录，目标为文件，抛出IO异常
-                throw new IORuntimeException("Src is a directory but dest is a file!");
+        if (src.isDirectory()) {//复制目录
+            System.out.println(src.getName());
+            File destName = new File(dest, src.getName());
+            if (!destName.exists()) {
+                destName.mkdirs();
             }
-            if (FileUtil.isSub(src,dest)){
-                throw new IORuntimeException("Dest is a sub directory of src !");
+            //获取目录下的所有文件和子目录
+            File[] files = src.listFiles();
+            //如果无子文件，直接结束
+            if (ArrayUtil.isEmpty(files)) {
+                return;
             }
-            //当拷贝来源是目录时是否只拷贝目录下的内容
-
+            for (File file : files) {
+                copyFileDigui(file, destName);
+            }
         }else {
-
+            FileUtil.copy(src,dest,false);
         }
+
 
     }
 }
